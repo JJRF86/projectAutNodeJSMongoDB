@@ -1,0 +1,39 @@
+<form id="login" method="post">
+  <span id="mensajeError" style="color:red"></span>
+  <br>
+  <input type="email" id="email" name="email" value="" placeholder="Ingresa Email">
+  <br><br>
+  <input type="password" id="password" name="password" value="" placeholder="Ingresa Password">
+  <br><br>
+  <input type="submit" value="Login">
+</form>
+<script type="text/javascript">
+
+  const formLogin = document.querySelector('#login');
+
+  formLogin.addEventListener('submit', event =>{
+    event.preventDefault();
+    var emailStr = document.getElementById('email').value;
+    var passwordStr = document.getElementById('password').value;
+    const params = new URLSearchParams();
+    params.set('email',emailStr);
+    params.set('password',passwordStr);
+
+    fetch('/api/loginUser',{
+      method: 'POST',
+      body: params,
+      headers: {'Content-Type':'application/x-www-form-urlencoded'}
+    })
+    .then(response => response.json())
+    .then(data => {
+      if(data.codigoError == 0 && data.token){
+        window.location.href = '/home';
+      }else if(data.codigoError == 2){
+        document.querySelector('#mensajeError').innerHTML = 'Password invalido';
+      }else if(data.codigoError == 1){
+        document.querySelector('#mensajeError').innerHTML = 'Ocurrio un error interno';
+      }
+    })
+    .catch(res =>{ alert('Ocurrio un error: '+res.message)});
+  });
+</script>
